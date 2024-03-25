@@ -1,0 +1,8 @@
+{
+  "compilerOptions": {
+    "outDir": "src/",
+    "rootDir": "ts/",
+    "lib": ["ES2020"],
+    "strict": true
+  }
+}
