@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "outDir": "src/",
+    "rootDir": "ts/",
+    "lib": ["ES2020","DOM"],
+    "strict": true,
+    "removeComments": true
+  }
+}
