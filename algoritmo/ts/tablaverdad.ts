@@ -1,12 +1,4 @@
 /**
- * 
- * Verbos de las funciones:
- * - Definir (set)
- * - Obtener (get)
- */
-
-
-/**
  * Devuelve una tabla de verdad en un arreglo de X-dimensiones según 
  * la cantidad de entradas que se especifique.
  * @returns number[]
@@ -37,8 +29,6 @@ function obtenerTablaVerdad(numeroEntradas:number, ):number[][] {
 function conversionDecimalaBinario(decimal:number):string {
     return (decimal >>> 0).toString(2);
 }
-
-const arreglo:number[][] = obtenerTablaVerdad(4);
 
 
  

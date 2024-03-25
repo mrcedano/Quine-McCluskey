@@ -1,16 +1,8 @@
 "use strict";
-/**
- *
- * Verbos de las funciones:
- * - Definir (set)
- * - Obtener (get)
- */
-/**
- * Devuelve una tabla de verdad en un arreglo de X-dimensiones según
- * la cantidad de entradas que se especifique.
- * @returns number[]
- */
 function obtenerTablaVerdad(numeroEntradas) {
+    if (numeroEntradas <= 1) {
+        throw new RangeError("Los números de entrada deben de ser mayor a 1");
+    }
     var entradas = Math.pow(numeroEntradas, 2);
     var tablaverdad = [];
     var format = "0".repeat(numeroEntradas);
@@ -21,11 +13,7 @@ function obtenerTablaVerdad(numeroEntradas) {
     }
     return tablaverdad;
 }
-/**
- * @param decimal Número Decimal
- * @returns Representación binaria del número decimal.
- */
 function conversionDecimalaBinario(decimal) {
     return (decimal >>> 0).toString(2);
 }
-var arreglo = obtenerTablaVerdad(2);
+var arreglo = obtenerTablaVerdad(4);
