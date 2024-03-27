@@ -16,4 +16,3 @@ function obtenerTablaVerdad(numeroEntradas) {
 function conversionDecimalaBinario(decimal) {
     return (decimal >>> 0).toString(2);
 }
-var arreglo = obtenerTablaVerdad(4);
