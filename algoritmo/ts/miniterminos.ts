@@ -4,16 +4,14 @@ type PrimeImplicant = {
     term: Term;
     used: boolean;
 };
-
-function findPrimeImplicants(expression: Term[]): PrimeImplicant[] {
+    function findPrimeImplicants(expression: Term[]): PrimeImplicant[] {
     const primeImplicants: PrimeImplicant[] = [];
     for (const term of expression) {
         primeImplicants.push({ term: term, used: false });
     }
     return primeImplicants;
 }
-
-function simplifyExpression(expression: Term[]): Term[] {
+    function simplifyExpression(expression: Term[]): Term[] {
     const primeImplicants = findPrimeImplicants(expression);
     return expression;
 }
@@ -23,7 +21,7 @@ function simplifyExpression(expression: Term[]): Term[] {
     return simplifiedExpression.join('|');
 }
     const userInput = "(A&B)|(C&D)";
-const simplifiedExpression = simplifyQuineMcCluskey(userInput);
-console.log("Expresión simplificada:", simplifiedExpression);
+    const simplifiedExpression = simplifyQuineMcCluskey(userInput);
+    console.log("Expresión simplificada:", simplifiedExpression);
 }
     
