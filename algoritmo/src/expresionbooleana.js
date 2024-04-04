@@ -5,111 +5,145 @@ var Operaciones;
     Operaciones[Operaciones["Multiplicacion"] = 1] = "Multiplicacion";
 })(Operaciones || (Operaciones = {}));
 function obtenerFragmentos(termino, valVariables, sigOperacion) {
-    var nuevoTermino = [];
+    var nuevoFormato = [];
     if (typeof termino == "number")
         return termino;
     if (Array.isArray(termino)) {
         for (var i = 0; i < termino.length; i++) {
             var val = obtenerFragmentos(termino[i], valVariables, sigOperacion);
             if (typeof val == "number") {
-                nuevoTermino.push(val);
+                nuevoFormato.push(val);
             }
             if (Array.isArray(val)) {
-                nuevoTermino = val;
+                nuevoFormato = val;
             }
         }
-        return nuevoTermino;
+        return obtenerResultado(nuevoFormato, sigOperacion);
     }
-    nuevoTermino = fragmentar(termino, valVariables);
-    if (Array.isArray(nuevoTermino)) {
-        return obtenerFragmentos(nuevoTermino, valVariables, sigOperacion);
+    nuevoFormato = termino;
+    if (termino.length > 1) {
+        var fragmentos = fragmentar(termino, valVariables);
+        nuevoFormato = fragmentos.termino;
+        sigOperacion = fragmentos.operacion;
     }
-    return aplicarValores(nuevoTermino, valVariables);
+    if (Array.isArray(nuevoFormato)) {
+        return obtenerFragmentos(nuevoFormato, valVariables, sigOperacion);
+    }
+    return aplicarValor(nuevoFormato, valVariables);
 }
 function fragmentar(termino, valVariables) {
-    var nuevoTermino = termino;
-    var sumasigno;
-    var regex;
-    var matches, count = 0;
+    var nuevoFormato = expandiendoTermino(termino).replace(".", "");
+    var sigOperacion;
+    var contador = 0;
+    var listaSignos = [
+        {
+            signo: "{",
+            regex: /\{.*?\}/g
+        },
+        {
+            signo: "[",
+            regex: /\[.*?\]/g
+        },
+        {
+            signo: "(",
+            regex: /\(.*?\)/g
+        }
+    ];
     var agrupaciones = [];
-    if (termino.length == 1) {
-        return termino;
-    }
-    if (nuevoTermino.indexOf("{") != -1) {
-        regex = /\{.*?\}/g;
-        matches = termino.match(regex);
-        console.log(matches);
-        if (matches != null) {
+    for (var i = 0; i < listaSignos.length; i++) {
+        if (nuevoFormato.indexOf(listaSignos[i].signo) != -1) {
+            var matches = nuevoFormato.match(listaSignos[i].regex);
+            if (matches == null)
+                throw new Error("#1 Existe & No Existe Match");
+            var reemplazos = reemplazandoAgrupaciones(nuevoFormato, matches, contador);
+            nuevoFormato = reemplazos.termino;
+            contador = reemplazos.contador;
             agrupaciones.push.apply(agrupaciones, matches);
-            for (var i = 0; i < matches.length; i++) {
-                var element = matches[i];
-                nuevoTermino = termino.replace(matches[i], count.toString());
-                count++;
-            }
         }
     }
-    if (nuevoTermino.indexOf("[") != -1) {
-        regex = /\[.*?\]/g;
-        ;
-        matches = termino.match(regex);
-        console.log(matches);
-        if (matches != null) {
-            agrupaciones.push.apply(agrupaciones, matches);
-            for (var i = 0; i < matches.length; i++) {
-                var element = matches[i];
-                nuevoTermino = termino.replace(matches[i], count.toString());
-                count++;
-            }
-        }
+    sigOperacion = detectarOperacion(nuevoFormato);
+    nuevoFormato = separandoTerminos(nuevoFormato, agrupaciones, sigOperacion);
+    return {
+        termino: nuevoFormato,
+        operacion: sigOperacion
+    };
+}
+function expandiendoTermino(termino) {
+    var nuevoTermino = termino;
+    var ABERTURA_REGEX = /[{[\(]/;
+    var ABERTURA = nuevoTermino.match(ABERTURA_REGEX);
+    var CERRADURAS = {
+        "{": "}",
+        "[": "]",
+        "(": ")"
+    };
+    if (termino[0].match(/[A-Z]/) || (ABERTURA === null || ABERTURA === void 0 ? void 0 : ABERTURA[0]) == null || (ABERTURA.index != termino.lastIndexOf(ABERTURA[0])) || termino[termino.length - 1] != CERRADURAS[ABERTURA[0]]) {
+        return nuevoTermino;
     }
-    if (nuevoTermino.indexOf("(") != -1) {
-        regex = /\(.*?\)/g;
-        matches = termino.match(regex);
-        if (matches != null) {
-            agrupaciones.push.apply(agrupaciones, matches);
-            for (var i = 0; i < matches.length; i++) {
-                var element = matches[i];
-                nuevoTermino = termino.replace(matches[i], count.toString());
-                count++;
-            }
-        }
-    }
-    sumasigno = nuevoTermino.includes("+");
-    if (sumasigno) {
-        nuevoTermino = nuevoTermino.split("+");
-        if (!(agrupaciones.length > 0)) {
-            return nuevoTermino;
-        }
-        var regexNum_1 = /\d/;
-        nuevoTermino.map(function (term) {
-            var numeros = term.match(regexNum_1);
-            if (numeros == null) {
-                return term;
-            }
-            console.log(numeros);
-        });
-    }
+    var llaveInicial = nuevoTermino[0] == "." ? 2 : 1;
+    nuevoTermino = nuevoTermino.substring(llaveInicial, nuevoTermino.length - 1);
     return nuevoTermino;
 }
-function aplicarValores(termino, valVariables) {
+function detectarOperacion(termino) {
+    return termino.includes("+") ? Operaciones.Suma : Operaciones.Multiplicacion;
+}
+function separandoTerminos(termino, agrupaciones, operacion) {
+    var nuevoFormato = termino;
+    if (agrupaciones.length == 0 && nuevoFormato.length == 1)
+        return nuevoFormato;
+    switch (operacion) {
+        case Operaciones.Suma:
+            nuevoFormato = nuevoFormato.split("+");
+            break;
+        case Operaciones.Multiplicacion:
+            nuevoFormato = nuevoFormato.split(nuevoFormato.includes(".") ? "." : "");
+    }
+    for (var i = 0; i < nuevoFormato.length; i++) {
+        var existenNumeros = nuevoFormato[i].match(/\d/);
+        if (!existenNumeros)
+            continue;
+        for (var j = 0; j < existenNumeros.length; j++) {
+            nuevoFormato[i] = nuevoFormato[i].replace(existenNumeros[j], agrupaciones[parseInt(existenNumeros[j])]);
+        }
+    }
+    return nuevoFormato;
+}
+function reemplazandoAgrupaciones(termino, matches, contador) {
+    for (var i = 0; i < matches.length; i++) {
+        var element = matches[i];
+        termino = termino.replace(matches[i], "." + contador.toString());
+        contador++;
+    }
+    return {
+        termino: termino,
+        contador: contador
+    };
+}
+function aplicarValor(termino, valVariables) {
     var auxTermino = termino;
-    return 1;
+    var valor = valVariables[termino.charCodeAt(0) - 65];
+    if (valor == undefined) {
+        throw new Error("Debes de especifícar un valor para todos las variables!");
+    }
+    return valor;
 }
 function resolverExpresionBooleana(termino, valVariables) {
-    if (typeof termino == "number") {
-        return termino;
-    }
     var resultado = 0;
-    var val = obtenerFragmentos(termino, valVariables, 0);
-    if (Array.isArray(val)) {
-        console.log("Devuelve un array correcto.");
-        console.log(val);
-    }
-    if (typeof termino == "number") {
-        return termino;
+    var VAL = obtenerFragmentos(termino, valVariables, 0);
+    if (typeof VAL == "number") {
+        return VAL;
     }
     return 0;
 }
-resolverExpresionBooleana("AB[A+C(A+B)]+CD", [1, 0, 1]);
-function obtenerResultado() {
+console.log(resolverExpresionBooleana("{AB[AB+B(C+A)]}+CD(AB+A)", [1, 1, 1, 1]));
+function obtenerResultado(termino, operacion) {
+    switch (operacion) {
+        case Operaciones.Suma:
+            return termino.includes(1) ? 1 : 0;
+        case Operaciones.Multiplicacion:
+            return termino.includes(0) ? 0 : 1;
+        default:
+            break;
+    }
+    return 0;
 }
