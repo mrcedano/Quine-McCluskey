@@ -182,12 +182,6 @@ function resolverExpresionBooleana(termino: string, valVariables: number[]): num
     return 0;
 }
 
-// resolverExpresionBooleana("AB+C", [1,0,1]) 
-// resolverExpresionBooleana("A(C+A)+AB", [1,0,1]);
-// resolverExpresionBooleana("AB[A+C(A+B)]+CD",[1,0,1])
-console.log(resolverExpresionBooleana("{AB[AB+B(C+A)]}+CD(AB+A)", [1, 1, 1,1]));
- 
-
 function obtenerResultado(termino:(string|number)[], operacion:Operaciones):number {
     switch (operacion) {
         case Operaciones.Suma:
@@ -200,3 +194,6 @@ function obtenerResultado(termino:(string|number)[], operacion:Operaciones):numb
 
     return 0;
 }
+
+
+export default resolverExpresionBooleana

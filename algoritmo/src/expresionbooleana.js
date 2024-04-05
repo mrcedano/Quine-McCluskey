@@ -1,4 +1,5 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var Operaciones;
 (function (Operaciones) {
     Operaciones[Operaciones["Suma"] = 0] = "Suma";
@@ -135,7 +136,6 @@ function resolverExpresionBooleana(termino, valVariables) {
     }
     return 0;
 }
-console.log(resolverExpresionBooleana("{AB[AB+B(C+A)]}+CD(AB+A)", [1, 1, 1, 1]));
 function obtenerResultado(termino, operacion) {
     switch (operacion) {
         case Operaciones.Suma:
@@ -147,3 +147,4 @@ function obtenerResultado(termino, operacion) {
     }
     return 0;
 }
+exports.default = resolverExpresionBooleana;
