@@ -1,5 +1,5 @@
 import resolverExpresionBooleana from "./expresionbooleana";
-import { obtenerPrimosImplicantes, agruparPrimosImplicantes, compararPrimosImplicantes } from "./quinnmcluskey";
+import { obtenerPrimosImplicantes, agruparPrimosImplicantes, comparacionPrimosImplicantes } from "./quinnmcluskey";
 /**
  * @param decimal Número Decimal
  * @returns Representación binaria del número decimal.
@@ -31,7 +31,8 @@ function obtenerTablaVerdad(expresion:string,numeroEntradas:number):number[][] {
     
     return NUEVATABLA;
 }
-const RESULTADO:number[][] = obtenerTablaVerdad("A+B",2)
+const RESULTADO:number[][] = obtenerTablaVerdad("A+B(C+D)+C+A(D+C)",4)
 const PRIMOS_IMPLICANTES:(string|number)[][] = obtenerPrimosImplicantes(RESULTADO)
 const AGRUPACION_PRIMOS_IMPLICANTES = agruparPrimosImplicantes(PRIMOS_IMPLICANTES)
-// const COMPARACION_PRIMOS_IMPLICANTES = compararPrimosImplicantes(AGRUPACION_PRIMOS_IMPLICANTES)
+console.log(AGRUPACION_PRIMOS_IMPLICANTES);
+const COMPARACION_PRIMOS_IMPLICANTES = comparacionPrimosImplicantes(AGRUPACION_PRIMOS_IMPLICANTES)
