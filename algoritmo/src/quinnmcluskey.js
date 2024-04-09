@@ -20,15 +20,16 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
     return to.concat(ar || Array.prototype.slice.call(from));
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.comparacionPrimosImplicantes = exports.agruparPrimosImplicantes = exports.obtenerPrimosImplicantes = void 0;
+exports.resolverTabla = exports.comparacionPrimosImplicantes = exports.agruparPrimosImplicantes = exports.obtenerPrimosImplicantes = void 0;
 function obtenerPrimosImplicantes(tabla) {
+    var TABLA = tabla.map(function (val) { return val; });
     var NUEVATABLA = [];
-    var ENTRADAS = tabla[0].length - 1;
+    var ENTRADAS = TABLA[0].length - 1;
     for (var m = 0; m < tabla.length; m++) {
-        if (tabla[m][ENTRADAS] == 0)
+        if (TABLA[m][ENTRADAS] == 0)
             continue;
-        tabla[m].pop();
-        NUEVATABLA.push(__spreadArray([(m + 1).toString()], tabla[m], true));
+        TABLA[m].pop();
+        NUEVATABLA.push(__spreadArray([(m + 1).toString()], TABLA[m], true));
     }
     return NUEVATABLA;
 }
@@ -54,21 +55,20 @@ function comparacionPrimosImplicantes(tabla) {
     var NUEVATABLA = tabla;
     var posibleComparacion = true;
     do {
-        var RESULTADO_1 = compararConjuntos(NUEVATABLA);
-        if (!("posibleComparacion" in RESULTADO_1))
+        var RESULTADO = compararConjuntos(NUEVATABLA);
+        if (!("posibleComparacion" in RESULTADO))
             throw new Error("Algo sucedio mal...");
-        posibleComparacion = RESULTADO_1.posibleComparacion;
-        NUEVATABLA = RESULTADO_1;
+        posibleComparacion = RESULTADO.posibleComparacion;
+        NUEVATABLA = RESULTADO;
     } while (posibleComparacion);
-    var RESULTADO = resolverTabla(NUEVATABLA);
-    console.log(NUEVATABLA);
-    return {};
+    return NUEVATABLA;
 }
 exports.comparacionPrimosImplicantes = comparacionPrimosImplicantes;
 function compararConjuntos(tabla) {
     var NUEVATABLA = {};
     var ARREGLO = Object.entries(tabla);
-    var posibleComparacion = false;
+    var posibleComparacion;
+    var PRIMOS_ESENCIALES = [];
     for (var u = 0; u < ARREGLO.length - 1; u++) {
         var CANTIDAD_UNOS = u + 1;
         var PRIMOS_IMPLICANTES = ARREGLO[u][1];
@@ -105,8 +105,10 @@ function compararConjuntos(tabla) {
                         NUEVO_PRIMO.push(-1);
                         cambios++;
                     }
-                    if (cambios > 1)
+                    if (cambios > 1) {
+                        PRIMOS_ESENCIALES.push(SIG_PRIMOS[k]);
                         continue;
+                    }
                     if (NUEVATABLA[CANTIDAD_UNOS] == undefined)
                         NUEVATABLA[CANTIDAD_UNOS] = [];
                     var MINITERMINO_1 = PRIMOS_IMPLICANTES[j][0].toString(), MINITERMINO_2 = SIG_PRIMOS[k][0].toString();
@@ -115,8 +117,42 @@ function compararConjuntos(tabla) {
             }
         }
     }
+    if (PRIMOS_ESENCIALES.length > 1) {
+        var ESENCIALES = obtenerPrimosEsenciales(PRIMOS_ESENCIALES);
+        for (var i = 0; i < ESENCIALES.length; i++) {
+            var PRIMO_ESENCIAL = ESENCIALES[i].filter(function (val) { return typeof val == "number"; });
+            var UNOS = PRIMO_ESENCIAL.reduce(function (acc, current) { return acc + current; });
+            if (typeof ESENCIALES[i][0] != "string")
+                throw new Error("Algo raro pasó...");
+            NUEVATABLA[UNOS].push(__spreadArray([ESENCIALES[i][0]], PRIMO_ESENCIAL, true));
+        }
+    }
+    posibleComparacion = Object.entries(NUEVATABLA).length > 1 ? true : false;
     return __assign(__assign({}, NUEVATABLA), { posibleComparacion: posibleComparacion });
 }
-function resolverTabla(tabla) {
-    return {};
+function obtenerPrimosEsenciales(esenciales) {
+    var MINITERMINOS = esenciales.map(function (val) { return val[0]; });
+    var PRIMOS_ESENCIALES = [];
+    for (var i = 0; i < MINITERMINOS.length; i++) {
+        var contador = 0;
+        for (var j = 0; j < MINITERMINOS.length; j++) {
+            var MINITERMO = MINITERMINOS[i];
+            if (MINITERMINOS[i] == MINITERMINOS[j]) {
+                contador++;
+            }
+        }
+        MINITERMINOS.shift();
+        if (contador > 1) {
+            var MINITERMINO = esenciales[i];
+            PRIMOS_ESENCIALES.push(MINITERMINO);
+        }
+    }
+    return PRIMOS_ESENCIALES;
 }
+function resolverTabla(tabla) {
+    var resultado = "";
+    var MINITERMINOS = tabla["1"][1].slice(1);
+    var TABLA = Object.entries(tabla);
+    return "";
+}
+exports.resolverTabla = resolverTabla;

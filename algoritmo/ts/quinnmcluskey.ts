@@ -6,18 +6,20 @@ type AgrupacionPrimosImplicantes = {
 type ResultadoComparacion = {
     posibleComparacion:boolean
 }
+
 /**
  * Devuelve el arreglo de todos los primos implicantes de la tabla de verdad.
  * @param tabla Tabla de verdad ya con los resultados de los casos  
  * @returns Arreglo de primos implicantes.
  */
 function obtenerPrimosImplicantes(tabla:number[][]):(string|number)[][]{
+    const TABLA = tabla.map((val) => val)
     const NUEVATABLA:(string|number)[][] = []
-    const ENTRADAS = tabla[0].length - 1
+    const ENTRADAS = TABLA[0].length - 1
     for (let m = 0; m < tabla.length; m++) {
-        if(tabla[m][ENTRADAS] == 0) continue
-        tabla[m].pop()
-        NUEVATABLA.push([(m+1).toString(),...tabla[m]])
+        if(TABLA[m][ENTRADAS] == 0) continue
+        TABLA[m].pop()
+        NUEVATABLA.push([(m+1).toString(),...TABLA[m]])
     }
     return NUEVATABLA
 }
@@ -46,33 +48,31 @@ function agruparPrimosImplicantes(tabla:(string|number)[][]):AgrupacionPrimosImp
  * @returns Objeto que contendrá los minitérminos esenciales.
  */
 function comparacionPrimosImplicantes(tabla:AgrupacionPrimosImplicantes):AgrupacionPrimosImplicantes {
-
     let existe_comparacion:boolean = false;
     let NUEVATABLA:AgrupacionPrimosImplicantes = tabla
     let posibleComparacion:boolean = true;
-
     do{
-        const RESULTADO:AgrupacionPrimosImplicantes&ResultadoComparacion = compararConjuntos(NUEVATABLA)      
+        const RESULTADO = compararConjuntos(NUEVATABLA)      
         if(!("posibleComparacion" in RESULTADO)) throw new Error("Algo sucedio mal...")
         posibleComparacion = RESULTADO.posibleComparacion
-        NUEVATABLA = RESULTADO;
+        NUEVATABLA = RESULTADO
     } while(posibleComparacion)
-
-    const RESULTADO = resolverTabla(NUEVATABLA)
-    console.log(NUEVATABLA);
-    return {}
+    return NUEVATABLA
 }
 
 function compararConjuntos(tabla:AgrupacionPrimosImplicantes):AgrupacionPrimosImplicantes&ResultadoComparacion {
     const NUEVATABLA:AgrupacionPrimosImplicantes = {}
     const ARREGLO = Object.entries(tabla)
-    let posibleComparacion:boolean = false
+    let posibleComparacion:boolean;
+    const PRIMOS_ESENCIALES:(string|number)[][] = [];
     for(let u = 0; u < ARREGLO.length - 1; u++) { 
         const CANTIDAD_UNOS:number = u+1
         const PRIMOS_IMPLICANTES = ARREGLO[u][1]
         const SIG_PRIMOS_IMPLICANTES = ARREGLO[u+1]
         const SIG_PRIMOS = SIG_PRIMOS_IMPLICANTES[1]
+
         if(SIG_PRIMOS_IMPLICANTES == undefined) break;
+
         for(let j = 0; j < PRIMOS_IMPLICANTES.length; j++) {
             const PRIMO = PRIMOS_IMPLICANTES[j].slice(1);
             const MINITERMINOS_GUARDADOS:string[] = [] 
@@ -86,7 +86,7 @@ function compararConjuntos(tabla:AgrupacionPrimosImplicantes):AgrupacionPrimosIm
                     let cambios:number = 0;
                     if(VALOR == VALOR_PRIMO || MINITERMINOS_GUARDADOS.includes(SIG_PRIMOS[k][0].toString())){
                         continue 
-                    }                
+                    }
                      MINITERMINOS_GUARDADOS.push(SIG_PRIMOS[k][0].toString())
                     for (let h = 0; h < SIG_PRIMO_ARREGLO.length ; h++) {
                             const VALOR_PRIMO_R = SIG_PRIMO_ARREGLO[h]
@@ -99,7 +99,10 @@ function compararConjuntos(tabla:AgrupacionPrimosImplicantes):AgrupacionPrimosIm
                             NUEVO_PRIMO.push(-1)
                             cambios++
                         }
-                    if(cambios > 1) continue;
+                    if(cambios > 1) {
+                        PRIMOS_ESENCIALES.push(SIG_PRIMOS[k])
+                        continue
+                    }
                     if(NUEVATABLA[CANTIDAD_UNOS] == undefined) NUEVATABLA[CANTIDAD_UNOS] = []
                     const MINITERMINO_1:string = PRIMOS_IMPLICANTES[j][0].toString(), MINITERMINO_2:string = SIG_PRIMOS[k][0].toString()
                     NUEVATABLA[CANTIDAD_UNOS].push(["".concat(MINITERMINO_1,",",MINITERMINO_2), ...NUEVO_PRIMO])
@@ -107,20 +110,51 @@ function compararConjuntos(tabla:AgrupacionPrimosImplicantes):AgrupacionPrimosIm
             }
         }
   }
-
+  
+  if(PRIMOS_ESENCIALES.length > 1) {
+    const ESENCIALES:(string|number)[][] = obtenerPrimosEsenciales(PRIMOS_ESENCIALES)      
+    for (let i = 0; i < ESENCIALES.length; i++) {
+        const PRIMO_ESENCIAL = ESENCIALES[i].filter((val) => typeof val == "number");
+        const UNOS = PRIMO_ESENCIAL.reduce((acc, current) => acc+current)
+        if(typeof ESENCIALES[i][0] != "string") throw new Error("Algo raro pasó...")
+        NUEVATABLA[UNOS].push([ESENCIALES[i][0], ...PRIMO_ESENCIAL])
+    }                    
+  }
+  posibleComparacion = Object.entries(NUEVATABLA).length > 1 ? true : false ;
   return {
     ...NUEVATABLA,
     posibleComparacion
   }
 }
 
-function resolverTabla(tabla:AgrupacionPrimosImplicantes) {
-    
-    return {}
+function obtenerPrimosEsenciales(esenciales:(string|number)[][]):(string|number)[][] {
+    const MINITERMINOS = esenciales.map((val) => val[0])
+    const PRIMOS_ESENCIALES:(string|number)[][] = []
+
+    for (let i = 0; i < MINITERMINOS.length; i++) {
+        let contador = 0
+
+        for (let j = 0; j < MINITERMINOS.length; j++) {
+            const MINITERMO = MINITERMINOS[i]
+            if(MINITERMINOS[i] == MINITERMINOS[j]) {
+                contador++
+            }            
+        }
+        MINITERMINOS.shift()
+
+        if(contador > 1) {
+            const MINITERMINO = esenciales[i]
+            PRIMOS_ESENCIALES.push(MINITERMINO)
+        }
+    }
+    return PRIMOS_ESENCIALES
 }
 
+function resolverTabla(tabla:AgrupacionPrimosImplicantes):string {
+    let resultado:string = ""
+    const MINITERMINOS:(string|number)[] = tabla["1"][1].slice(1);
+    const TABLA = Object.entries(tabla);
 
-
-export {obtenerPrimosImplicantes, agruparPrimosImplicantes, comparacionPrimosImplicantes}
-    
- 
+    return ""
+}
+export {obtenerPrimosImplicantes, agruparPrimosImplicantes, comparacionPrimosImplicantes, resolverTabla}
