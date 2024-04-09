@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var expresionbooleana_1 = require("./expresionbooleana");
-var miniterminos_1 = require("./miniterminos");
+var quinnmcluskey_1 = require("./quinnmcluskey");
 function conversionDecimalaBinario(decimal) {
     return (decimal >>> 0).toString(2);
 }
@@ -21,6 +21,9 @@ function obtenerTablaVerdad(expresion, numeroEntradas) {
     }
     return NUEVATABLA;
 }
-var RESULTADO = obtenerTablaVerdad("A+B", 2);
-var PRIMOS_IMPLICANTES = (0, miniterminos_1.obtenerPrimosImplicantes)(RESULTADO);
-var AGRUPACION_PRIMOS_IMPLICANTES = (0, miniterminos_1.agruparPrimosImplicantes)(PRIMOS_IMPLICANTES);
+var TABLAVERDAD = obtenerTablaVerdad("A+B(C+A)+B(C+A)", 3);
+var PRIMOS_IMPLICANTES = (0, quinnmcluskey_1.obtenerPrimosImplicantes)(TABLAVERDAD);
+var AGRUPACION_PRIMOS_IMPLICANTES = (0, quinnmcluskey_1.agruparPrimosImplicantes)(PRIMOS_IMPLICANTES);
+var COMPARACION_PRIMOS_IMPLICANTES = (0, quinnmcluskey_1.comparacionPrimosImplicantes)(AGRUPACION_PRIMOS_IMPLICANTES);
+var RESULTADO = (0, quinnmcluskey_1.resolverTabla)(COMPARACION_PRIMOS_IMPLICANTES);
+console.log(COMPARACION_PRIMOS_IMPLICANTES);
