@@ -1,9 +1,11 @@
 {
   "compilerOptions": {
     "outDir": "src/",
-    "rootDir": "ts/",
+    "rootDirs": ["ts/","ts/modulos"],
     "lib": ["ES2020","DOM"],
     "strict": true,
-    "removeComments": true
+    "removeComments": true,
+    "allowJs": true,
+    "module": "ES2020"
   }
 }
