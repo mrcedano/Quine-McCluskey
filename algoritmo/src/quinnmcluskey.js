@@ -54,18 +54,47 @@ function comparacionPrimosImplicantes(tabla) {
     var existe_comparacion = false;
     var NUEVATABLA = tabla;
     var posibleComparacion = true;
+    var PRIMOS_ESENCIALES = {};
     do {
         var RESULTADO = compararConjuntos(NUEVATABLA);
-        if (!("posibleComparacion" in RESULTADO))
+        if (!("posibleComparacion" in RESULTADO) || !("PRIMOS_ES" in RESULTADO))
             throw new Error("Algo sucedio mal...");
         posibleComparacion = RESULTADO.posibleComparacion;
         NUEVATABLA = RESULTADO;
+        PRIMOS_ESENCIALES = __assign(__assign({}, PRIMOS_ESENCIALES), RESULTADO.PRIMOS_ES);
     } while (posibleComparacion);
-    return NUEVATABLA;
+    if ("PRIMOS_ES" in NUEVATABLA)
+        NUEVATABLA.PRIMOS_ES = undefined;
+    NUEVATABLA = eliminarRepetidos(NUEVATABLA);
+    PRIMOS_ESENCIALES = eliminarRepetidos(PRIMOS_ESENCIALES);
+    return __assign(__assign({}, NUEVATABLA), PRIMOS_ESENCIALES);
 }
 exports.comparacionPrimosImplicantes = comparacionPrimosImplicantes;
+function eliminarRepetidos(agrupacion) {
+    var TABLA = Object.entries(agrupacion);
+    var REGEXNUMERO = /^-?\d*\.?\d+$/;
+    var NUEVATABLA = {};
+    var VALORES = [];
+    for (var i = 0; i < TABLA.length; i++) {
+        var ARREGLO = TABLA[i];
+        if (!(ARREGLO[0].match(REGEXNUMERO)))
+            continue;
+        var UNOS = parseInt(ARREGLO[0]);
+        if (NUEVATABLA[UNOS] == undefined)
+            NUEVATABLA[UNOS] = [];
+        for (var j = 0; j < ARREGLO[1].length; j++) {
+            var VALOR = ARREGLO[1][j].slice(1).toString();
+            if (!(VALORES.includes(VALOR))) {
+                NUEVATABLA[UNOS].push(ARREGLO[1][j]);
+                VALORES.push(VALOR);
+            }
+        }
+    }
+    return NUEVATABLA;
+}
 function compararConjuntos(tabla) {
     var NUEVATABLA = {};
+    var PRIMOS_ES = {};
     var ARREGLO = Object.entries(tabla);
     var posibleComparacion;
     var PRIMOS_ESENCIALES = [];
@@ -120,15 +149,21 @@ function compararConjuntos(tabla) {
     if (PRIMOS_ESENCIALES.length > 1) {
         var ESENCIALES = obtenerPrimosEsenciales(PRIMOS_ESENCIALES);
         for (var i = 0; i < ESENCIALES.length; i++) {
-            var PRIMO_ESENCIAL = ESENCIALES[i].filter(function (val) { return typeof val == "number"; });
-            var UNOS = PRIMO_ESENCIAL.reduce(function (acc, current) { return acc + current; });
+            var PRIMO_ESENCIAL = ESENCIALES[i].filter(function (v) { return typeof v == "number"; });
+            var UNOS = PRIMO_ESENCIAL.reduce(function (acc, current) {
+                if (current == -1)
+                    return acc;
+                return acc + current;
+            }, 0);
             if (typeof ESENCIALES[i][0] != "string")
                 throw new Error("Algo raro pasó...");
-            NUEVATABLA[UNOS].push(__spreadArray([ESENCIALES[i][0]], PRIMO_ESENCIAL, true));
+            if (PRIMOS_ES[UNOS] == undefined)
+                PRIMOS_ES[UNOS] = [];
+            PRIMOS_ES[UNOS].push(__spreadArray([ESENCIALES[i][0]], PRIMO_ESENCIAL, true));
         }
     }
     posibleComparacion = Object.entries(NUEVATABLA).length > 1 ? true : false;
-    return __assign(__assign({}, NUEVATABLA), { posibleComparacion: posibleComparacion });
+    return __assign(__assign({}, NUEVATABLA), { posibleComparacion: posibleComparacion, PRIMOS_ES: PRIMOS_ES });
 }
 function obtenerPrimosEsenciales(esenciales) {
     var MINITERMINOS = esenciales.map(function (val) { return val[0]; });
@@ -141,7 +176,6 @@ function obtenerPrimosEsenciales(esenciales) {
                 contador++;
             }
         }
-        MINITERMINOS.shift();
         if (contador > 1) {
             var MINITERMINO = esenciales[i];
             PRIMOS_ESENCIALES.push(MINITERMINO);
@@ -151,8 +185,44 @@ function obtenerPrimosEsenciales(esenciales) {
 }
 function resolverTabla(tabla) {
     var resultado = "";
-    var MINITERMINOS = tabla["1"][1].slice(1);
     var TABLA = Object.entries(tabla);
-    return "";
+    var ARREGLO = [];
+    var LISTA = [];
+    var CONTADORES = {};
+    for (var i = 0; i < TABLA.length; i++) {
+        var CONJUNTO = TABLA[i];
+        for (var j = 0; j < CONJUNTO[1].length; j++) {
+            ARREGLO.push(CONJUNTO[1][j][0].toString().split(","));
+            LISTA.push(CONJUNTO[1][j]);
+        }
+    }
+    for (var i = 0; i < ARREGLO.length; i++) {
+        var ARR = ARREGLO[i];
+        for (var j = 0; j < ARR.length; j++) {
+            if (CONTADORES[ARR[j]] == undefined)
+                CONTADORES[ARR[j]] = 0;
+            CONTADORES[ARR[j]]++;
+        }
+    }
+    var ARREGLO_CONTADORES = Object.entries(CONTADORES)
+        .filter(function (arr) { return arr[1] == 1; }).flat().filter(function (val) { return typeof val == "string"; });
+    for (var i = 0; i < ARREGLO.length; i++) {
+        var MINITERMINOS = ARREGLO[i];
+        for (var j = 0; j < ARREGLO_CONTADORES.length; j++) {
+            var MINITERMINO_ES = ARREGLO_CONTADORES[j];
+            if (MINITERMINOS.includes(MINITERMINO_ES)) {
+                var NUMEROS = LISTA[i].slice(1).filter(function (ev) { return typeof ev == "number"; });
+                for (var m = 0; m < NUMEROS.length; m++) {
+                    var NUMERO = NUMEROS[m];
+                    if (NUMERO == -1)
+                        continue;
+                    resultado += String.fromCharCode(65 + m);
+                }
+                resultado += "+";
+                break;
+            }
+        }
+    }
+    return resultado.substring(0, resultado.length - 1);
 }
 exports.resolverTabla = resolverTabla;

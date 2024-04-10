@@ -4,7 +4,8 @@ type AgrupacionPrimosImplicantes = {
 }
 
 type ResultadoComparacion = {
-    posibleComparacion:boolean
+    posibleComparacion:boolean,
+    PRIMOS_ES: AgrupacionPrimosImplicantes
 }
 
 /**
@@ -48,20 +49,54 @@ function agruparPrimosImplicantes(tabla:(string|number)[][]):AgrupacionPrimosImp
  * @returns Objeto que contendrá los minitérminos esenciales.
  */
 function comparacionPrimosImplicantes(tabla:AgrupacionPrimosImplicantes):AgrupacionPrimosImplicantes {
-    let existe_comparacion:boolean = false;
+    let existe_comparacion:boolean = false
     let NUEVATABLA:AgrupacionPrimosImplicantes = tabla
-    let posibleComparacion:boolean = true;
+    let posibleComparacion:boolean = true
+    let PRIMOS_ESENCIALES:AgrupacionPrimosImplicantes = {}
     do{
         const RESULTADO = compararConjuntos(NUEVATABLA)      
-        if(!("posibleComparacion" in RESULTADO)) throw new Error("Algo sucedio mal...")
+        if(!("posibleComparacion" in RESULTADO) || !("PRIMOS_ES" in RESULTADO)) throw new Error("Algo sucedio mal...")
         posibleComparacion = RESULTADO.posibleComparacion
         NUEVATABLA = RESULTADO
+        PRIMOS_ESENCIALES = {...PRIMOS_ESENCIALES,...RESULTADO.PRIMOS_ES}
     } while(posibleComparacion)
+        if("PRIMOS_ES" in NUEVATABLA) NUEVATABLA.PRIMOS_ES = undefined
+        NUEVATABLA = eliminarRepetidos(NUEVATABLA)
+        PRIMOS_ESENCIALES = eliminarRepetidos(PRIMOS_ESENCIALES)
+
+    return {...NUEVATABLA,...PRIMOS_ESENCIALES}
+}
+
+/**
+ * Con esta función se elimina todos los elementos repetidos.
+ * @param agrupacion Agrupación de los primos esenciales.
+ * @returns Una nueva agrupación sin los elementos repetidos.
+ */
+function eliminarRepetidos(agrupacion:AgrupacionPrimosImplicantes):AgrupacionPrimosImplicantes {
+    const TABLA = Object.entries(agrupacion)        
+    const REGEXNUMERO = /^-?\d*\.?\d+$/;
+    const NUEVATABLA:AgrupacionPrimosImplicantes = {}
+    const VALORES:string[] = []
+    for (let i = 0; i < TABLA.length; i++) {
+        const ARREGLO = TABLA[i];
+        if(!(ARREGLO[0].match(REGEXNUMERO))) continue
+        const UNOS = parseInt(ARREGLO[0])
+        if(NUEVATABLA[UNOS] == undefined) NUEVATABLA[UNOS] = []
+
+        for(let j = 0; j < ARREGLO[1].length; j++){
+            const VALOR:string = ARREGLO[1][j].slice(1).toString()
+            if(!(VALORES.includes(VALOR))){
+                NUEVATABLA[UNOS].push(ARREGLO[1][j])
+                VALORES.push(VALOR)
+            }                        
+        }
+    }
     return NUEVATABLA
 }
 
 function compararConjuntos(tabla:AgrupacionPrimosImplicantes):AgrupacionPrimosImplicantes&ResultadoComparacion {
     const NUEVATABLA:AgrupacionPrimosImplicantes = {}
+    const PRIMOS_ES:AgrupacionPrimosImplicantes = {}
     const ARREGLO = Object.entries(tabla)
     let posibleComparacion:boolean;
     const PRIMOS_ESENCIALES:(string|number)[][] = [];
@@ -112,18 +147,24 @@ function compararConjuntos(tabla:AgrupacionPrimosImplicantes):AgrupacionPrimosIm
   }
   
   if(PRIMOS_ESENCIALES.length > 1) {
-    const ESENCIALES:(string|number)[][] = obtenerPrimosEsenciales(PRIMOS_ESENCIALES)      
+  const ESENCIALES:(string|number)[][] = obtenerPrimosEsenciales(PRIMOS_ESENCIALES)      
+  
     for (let i = 0; i < ESENCIALES.length; i++) {
-        const PRIMO_ESENCIAL = ESENCIALES[i].filter((val) => typeof val == "number");
-        const UNOS = PRIMO_ESENCIAL.reduce((acc, current) => acc+current)
+        const PRIMO_ESENCIAL:number[] = ESENCIALES[i].filter((v) => typeof v == "number")
+        const UNOS:number = PRIMO_ESENCIAL.reduce((acc, current) => {
+            if(current == -1) return acc
+            return acc + current
+        },0)    
         if(typeof ESENCIALES[i][0] != "string") throw new Error("Algo raro pasó...")
-        NUEVATABLA[UNOS].push([ESENCIALES[i][0], ...PRIMO_ESENCIAL])
+        if(PRIMOS_ES[UNOS] == undefined) PRIMOS_ES[UNOS] = []
+        PRIMOS_ES[UNOS].push([ESENCIALES[i][0], ...PRIMO_ESENCIAL])
     }                    
   }
   posibleComparacion = Object.entries(NUEVATABLA).length > 1 ? true : false ;
   return {
     ...NUEVATABLA,
-    posibleComparacion
+    posibleComparacion,
+    PRIMOS_ES
   }
 }
 
@@ -140,8 +181,6 @@ function obtenerPrimosEsenciales(esenciales:(string|number)[][]):(string|number)
                 contador++
             }            
         }
-        MINITERMINOS.shift()
-
         if(contador > 1) {
             const MINITERMINO = esenciales[i]
             PRIMOS_ESENCIALES.push(MINITERMINO)
@@ -152,9 +191,47 @@ function obtenerPrimosEsenciales(esenciales:(string|number)[][]):(string|number)
 
 function resolverTabla(tabla:AgrupacionPrimosImplicantes):string {
     let resultado:string = ""
-    const MINITERMINOS:(string|number)[] = tabla["1"][1].slice(1);
-    const TABLA = Object.entries(tabla);
+    const TABLA = Object.entries(tabla);    
+    const ARREGLO:(string|number)[][] = []
+    const LISTA:(string|number)[][] = []
+    const CONTADORES:{
+        [key:string]: number 
+    } = {}
 
-    return ""
+   for (let i = 0; i < TABLA.length; i++) {
+       const CONJUNTO = TABLA[i];
+        for (let j = 0; j < CONJUNTO[1].length; j++) {
+            ARREGLO.push(CONJUNTO[1][j][0].toString().split(","))
+            LISTA.push(CONJUNTO[1][j])
+        }     
+   }
+    for (let i = 0; i < ARREGLO.length; i++) {
+        const ARR = ARREGLO[i]
+        for (let j = 0; j < ARR.length; j++) {
+            if(CONTADORES[ARR[j]] == undefined) CONTADORES[ARR[j]] = 0
+            CONTADORES[ARR[j]]++
+        }        
+    }   
+    const ARREGLO_CONTADORES = Object.entries(CONTADORES)
+    .filter((arr) => arr[1] == 1 ).flat().filter((val) => typeof val == "string" )
+
+    for (let i = 0; i < ARREGLO.length; i++) {
+        const MINITERMINOS = ARREGLO[i];
+        for (let j = 0; j < ARREGLO_CONTADORES.length; j++) {
+            const MINITERMINO_ES = ARREGLO_CONTADORES[j];
+            if(MINITERMINOS.includes(MINITERMINO_ES)) {
+                const NUMEROS:number[] = LISTA[i].slice(1).filter((ev) => typeof ev == "number")
+                for (let m = 0; m < NUMEROS.length; m++) {
+                    const NUMERO = NUMEROS[m];  
+                    if(NUMERO == -1) continue
+                    resultado += String.fromCharCode(65 + m)
+                }
+                resultado += "+"
+                break
+            }
+        }
+    }    
+    
+    return resultado.substring(0,resultado.length - 1)
 }
 export {obtenerPrimosImplicantes, agruparPrimosImplicantes, comparacionPrimosImplicantes, resolverTabla}

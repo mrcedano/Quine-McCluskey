@@ -21,9 +21,9 @@ function obtenerTablaVerdad(expresion, numeroEntradas) {
     }
     return NUEVATABLA;
 }
-var TABLAVERDAD = obtenerTablaVerdad("A+B(C+A)+B(C+A)", 3);
+var TABLAVERDAD = obtenerTablaVerdad("A(CD+D+B)+D(A+B)", 4);
 var PRIMOS_IMPLICANTES = (0, quinnmcluskey_1.obtenerPrimosImplicantes)(TABLAVERDAD);
 var AGRUPACION_PRIMOS_IMPLICANTES = (0, quinnmcluskey_1.agruparPrimosImplicantes)(PRIMOS_IMPLICANTES);
 var COMPARACION_PRIMOS_IMPLICANTES = (0, quinnmcluskey_1.comparacionPrimosImplicantes)(AGRUPACION_PRIMOS_IMPLICANTES);
 var RESULTADO = (0, quinnmcluskey_1.resolverTabla)(COMPARACION_PRIMOS_IMPLICANTES);
-console.log(COMPARACION_PRIMOS_IMPLICANTES);
+console.log(RESULTADO);
