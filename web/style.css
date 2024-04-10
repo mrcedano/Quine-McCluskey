@@ -1,0 +1,164 @@
+/* Recursos */
+
+@font-face {
+    font-family: "Honk";
+    src: url(recursos/fuentes/Honk-Regular-VariableFont_MORF\,SHLN.ttf) format("truetype");
+}
+
+@font-face {
+    font-family: "Kalam";
+    src: url(recursos/fuentes/Kalam-Bold.ttf) format("truetype");
+}
+
+@font-face {
+    font-family: "Pixelify";
+    src: url(recursos/fuentes/Pixelify.ttf) format("truetype");
+}
+
+/* Estilos */
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+}
+
+.container {
+    width: 100%;
+    p{
+        font-size: 1.2rem;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI';
+    }
+}
+
+.front {
+ align-content: center;
+ text-align: center;
+ background-image: url("recursos/portada.jpeg");
+ background-size: cover;
+    height: 300px;
+
+ h1 {
+    margin: 0;
+    font-size: 3rem;
+    color: white;
+    font-family: "Honk", Impact;
+}
+
+}
+
+.historia{
+    display: flex;
+    gap: 50px;
+    box-shadow: rgba(0, 0, 0, 0.25) 0px 4px 8px -2px, rgba(0, 0, 0, 0.08) 0px 0px 0px 1px;
+}
+
+#imagen-logo {
+    width: 100%;
+
+    max-width: 300px;
+    text-align: right;
+}
+
+#imagen-logo img{
+    height: 90%;
+    margin: 10px;
+    height: 200px;
+
+    border-radius: 50%;
+}
+
+#descripcion {
+    
+    h2 {
+        font-family: "Kalam";
+    }
+
+}
+
+.parrafo {
+    width: 80%;
+    text-align: left;    
+
+    font-size: 16px;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI';
+}
+
+
+.calculadora {    
+    padding: 20px;
+    background-color: rgb(238, 238, 238);
+    text-align: center;
+    
+    h2{
+        margin: 0;
+        font-size: 3rem;
+        font-family: "Pixelify";
+    }
+
+  
+}
+
+.textbox {
+    padding: 7px;
+    font-size: 1.5rem;
+    outline: none;
+    text-align: center;
+}
+
+.input_agrupamiento {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.enviar {
+  align-items: center;
+  background-clip: padding-box;
+  background-color: #fa6400;
+  border: 1px solid transparent;
+  border-radius: .25rem;
+  box-shadow: rgba(0, 0, 0, 0.02) 0 1px 3px 0;
+  box-sizing: border-box;
+  color: #fff;
+  cursor: pointer;
+  display: inline-flex;
+  font-family: system-ui,-apple-system,system-ui,"Helvetica Neue",Helvetica,Arial,sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  justify-content: center;
+  line-height: 1.25;
+  margin: 0;
+  min-height: 3rem;
+  padding: calc(.875rem - 1px) calc(1.5rem - 1px);
+  position: relative;
+  text-decoration: none;
+  transition: all 250ms;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  vertical-align: baseline;
+  width: auto;
+}
+
+.enviar:hover,
+.enviar:focus {
+  background-color: #fb8332;
+  box-shadow: rgba(0, 0, 0, 0.1) 0 4px 12px;
+}
+
+.enviar:hover {
+  transform: translateY(-1px);
+}
+
+.enviar:active {
+  background-color: #c85000;
+  box-shadow: rgba(0, 0, 0, .06) 0 2px 4px;
+  transform: translateY(0);
+}
+
+.footer {
+    background-color: orange;
+}

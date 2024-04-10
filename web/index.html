@@ -3,58 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quinn-McCluskey</title>
+    <meta name="author" content="Oscar Noel Cedano Beltran">
+    <meta name="description" content="Algoritmo de Quine-McCluskey para simplificar expresiones booleanas a su mínima expresión.">
+    <meta name="distribution" content="local">
+    <meta name="robots" content="all">
+    <meta http-equiv="content-language" content="es-mx">
+
+    <link rel="apple-touch-icon" sizes="180x180" href="recursos/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="recursos/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="recursos/favicon-16x16.png">
+    <link rel="manifest" href="recursos/site.webmanifest">
+
+    <link rel="stylesheet" href="style.css"/>
+    <title>Quine-McCluskey</title>
 </head>
 <body>
-    <h1>Quinn-McCluskey</h1>
+    <section id="inicio">
+        <div class="container front">
+            <h1>Quine-McCluskey</h1>
+        </div>
+    </section>
 
-    <p>Método de Quinn-McCluskey</p>
-    <input id="expresion" type="text" placeholder="Escribe la expresión booleana">
-    <button id="enviar">Simplificar Expresion</button>
-    <script src="src/pedirdatos.js"></script>
-</body>
-<body>
-function generarTablaVerdad(variables) {
-    const numVariables = variables.length;
-    const numFilas = Math.pow(2, numVariables);
+    <section id="historia">
+        <div class="container historia">
+            <div id="imagen-logo">
+                <img src="recursos/icono.jpeg" alt="Imagen del logo">
+            </div>
+           
+            <div id="descripcion">
+                <h2>¿Qué es el método de Quine-McCluskey?</h2>
+                <p class="parrafo">El método de Quine-McCluskey simplifica funciones booleanas identificando minitérminos, agrupándolos en términos de suma de productos, buscando términos primos esenciales y combinando términos redundantes para obtener una expresión booleana mínima. Es crucial en el diseño eficiente de circuitos digitales.</p>
+            </div>
+        </div>
+    </section>
 
-    const tablaVerdad = document.createElement('table');
+    <section id="calculadora">
+        <div class="container calculadora">
+            <h2>Calculadora</h2>
+            <p>La siguiente calculadora utiliza el algoritmo de Quine-McCluskey</p>
 
-    const encabezado = tablaVerdad.createTHead();
-    const encabezadoFila = encabezado.insertRow();
-    for (let i = 0; i < numVariables; i++) {
-        const th = document.createElement('th');
-        th.textContent = variables[i];
-        encabezadoFila.appendChild(th);
-    }
-    const thResultado = document.createElement('th');
-    thResultado.textContent = 'Resultado';
-    encabezadoFila.appendChild(thResultado);
+            <div class="container input_agrupamiento">
+                <input type="text" id="input_expresion" class="textbox" placeholder="Expresión Booleana">
+                <input type="text" id="input_valores" class="textbox" placeholder="Valores">
+                <button class="enviar">Resolver</button>
+            </div>
+        </div>
+    </section>
+
+    <section id="resultados">
+
+    </section>
+
+    <footer>
         
-    const cuerpoTabla = tablaVerdad.createTBody();
-
-    for (let i = 0; i < numFilas; i++) {
-        const fila = cuerpoTabla.insertRow();
-        const binario = (i).toString(2).padStart(numVariables, '0');
-        for (let j = 0; j < numVariables; j++) {
-            const celda = fila.insertCell();
-            celda.textContent = binario[j];
-        }
-        const resultado = evaluarExpresion(binario);
-        const celdaResultado = fila.insertCell();
-        celdaResultado.textContent = resultado ? '1' : '0';
-    }
-    return tablaVerdad;
-}
-function evaluarExpresion(binario) {
-    const suma = binario.split('').reduce((acc, val) => acc + parseInt(val), 0);
-    return suma % 2 === 0;
-}
-const variables = ['A', 'B'];
-const tablaVerdadContainer = document.getElementById('tablaVerdadContainer');
-tablaVerdadContainer.appendChild(generarTablaVerdad(variables));
-</body>
-    <body>
-        <h1>CEDANO BELTRAN OSCAR NOEL, ARELLANO SANDOVAL JESUS ARMANDO, ORTEGA VIZCARRA JOSE ANGEL</h1>
+    </footer>
+    
     </body>
 </html>
