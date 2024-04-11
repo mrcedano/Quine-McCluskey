@@ -1,23 +1,44 @@
-var Operaciones;
-(function (Operaciones) {
-    Operaciones[Operaciones["Suma"] = 0] = "Suma";
-    Operaciones[Operaciones["Multiplicacion"] = 1] = "Multiplicacion";
-})(Operaciones || (Operaciones = {}));
-function obtenerFragmentos(termino, valVariables, sigOperacion) {
+"use strict";
+var listaSignos = [
+    {
+        signo: "{",
+        regex: /\{.*?\}/g
+    },
+    {
+        signo: "[",
+        regex: /\[.*?\]/g
+    },
+    {
+        signo: "(",
+        regex: /\(.*?\)/g
+    }
+];
+/**
+ * Esta función recibe una expresión booleana y la fragmenta en términos independientes.
+ * @returns string[]
+ */
+function obtenerFragmentos(termino, valVariables, sigOperacion, negacion) {
+    var negacionAntes = negacion;
     var nuevoFormato = [];
     if (typeof termino == "number")
         return termino;
     if (Array.isArray(termino)) {
         for (var i = 0; i < termino.length; i++) {
-            var val = obtenerFragmentos(termino[i], valVariables, sigOperacion);
-            if (typeof val == "number") {
-                nuevoFormato.push(val);
+            var term = termino[i];
+            if (typeof term == "string") {
+                var NEGS = obtenerNegados(term);
+                term = NEGS.termino;
+                negacion = NEGS.negado;
             }
-            if (Array.isArray(val)) {
-                nuevoFormato = val;
+            var VALUE = obtenerFragmentos(term, valVariables, sigOperacion, negacion);
+            if (typeof VALUE == "number") {
+                nuevoFormato.push(VALUE);
+            }
+            if (Array.isArray(VALUE)) {
+                nuevoFormato = VALUE;
             }
         }
-        return obtenerResultado(nuevoFormato, sigOperacion);
+        return obtenerResultado(nuevoFormato, sigOperacion, negacionAntes);
     }
     nuevoFormato = termino;
     if (termino.length > 1) {
@@ -26,28 +47,41 @@ function obtenerFragmentos(termino, valVariables, sigOperacion) {
         sigOperacion = fragmentos.operacion;
     }
     if (Array.isArray(nuevoFormato)) {
-        return obtenerFragmentos(nuevoFormato, valVariables, sigOperacion);
+        return obtenerFragmentos(nuevoFormato, valVariables, sigOperacion, negacion);
     }
-    return aplicarValor(nuevoFormato, valVariables);
+    return aplicarValor(termino, valVariables, negacion);
+}
+function obtenerNegados(expresion) {
+    var PATRON = /[a-zA-Z]'/;
+    var hay_negado = false;
+    var nueva_expresion = expresion;
+    if (PATRON.test(nueva_expresion) && nueva_expresion.length < 3) {
+        nueva_expresion = nueva_expresion[0];
+        hay_negado = true;
+    }
+    if (expresion[expresion.length - 1] == "'") {
+        for (var i = 0; i < listaSignos.length; i++) {
+            var SIGNO = listaSignos[i];
+            if ((expresion[0] == SIGNO.signo || expresion[1] == SIGNO.signo)) {
+                hay_negado = true;
+                nueva_expresion = expresion.substring(0, expresion.length - 1);
+                break;
+            }
+        }
+    }
+    if (PATRON.test(nueva_expresion) && nueva_expresion.length < 3) {
+        nueva_expresion = nueva_expresion[0];
+        hay_negado = true;
+    }
+    return {
+        termino: nueva_expresion,
+        negado: hay_negado
+    };
 }
 function fragmentar(termino, valVariables) {
     var nuevoFormato = expandiendoTermino(termino).replace(".", "");
     var sigOperacion;
     var contador = 0;
-    var listaSignos = [
-        {
-            signo: "{",
-            regex: /\{.*?\}/g
-        },
-        {
-            signo: "[",
-            regex: /\[.*?\]/g
-        },
-        {
-            signo: "(",
-            regex: /\(.*?\)/g
-        }
-    ];
     var agrupaciones = [];
     for (var i = 0; i < listaSignos.length; i++) {
         if (nuevoFormato.indexOf(listaSignos[i].signo) != -1) {
@@ -84,25 +118,36 @@ function expandiendoTermino(termino) {
     return nuevoTermino;
 }
 function detectarOperacion(termino) {
-    return termino.includes("+") ? Operaciones.Suma : Operaciones.Multiplicacion;
+    return termino.includes("+") ? 1 : 0;
 }
 function separandoTerminos(termino, agrupaciones, operacion) {
     var nuevoFormato = termino;
-    if (agrupaciones.length == 0 && nuevoFormato.length == 1)
+    if (nuevoFormato.length == 1)
         return nuevoFormato;
+    var MATCH = nuevoFormato.matchAll(/'[A-Z]/g); // Devuelve un iterador.
+    // Agregando . después de los signos de negación '.
+    var result = MATCH.next(), i = 1;
+    while (!result.done) {
+        var INDEX = result.value.index;
+        var AUX = nuevoFormato;
+        nuevoFormato = nuevoFormato.slice(0, INDEX + i).concat(".");
+        nuevoFormato = nuevoFormato.concat(AUX.slice(INDEX + i));
+        result = MATCH.next();
+        i++;
+    }
     switch (operacion) {
-        case Operaciones.Suma:
+        case 1:
             nuevoFormato = nuevoFormato.split("+");
             break;
-        case Operaciones.Multiplicacion:
+        case 0:
             nuevoFormato = nuevoFormato.split(nuevoFormato.includes(".") ? "." : "");
     }
-    for (var i = 0; i < nuevoFormato.length; i++) {
-        var existenNumeros = nuevoFormato[i].match(/\d/);
+    for (var i_1 = 0; i_1 < nuevoFormato.length; i_1++) {
+        var existenNumeros = nuevoFormato[i_1].match(/\d/);
         if (!existenNumeros)
             continue;
         for (var j = 0; j < existenNumeros.length; j++) {
-            nuevoFormato[i] = nuevoFormato[i].replace(existenNumeros[j], agrupaciones[parseInt(existenNumeros[j])]);
+            nuevoFormato[i_1] = nuevoFormato[i_1].replace(existenNumeros[j], agrupaciones[parseInt(existenNumeros[j])]);
         }
     }
     return nuevoFormato;
@@ -118,31 +163,52 @@ function reemplazandoAgrupaciones(termino, matches, contador) {
         contador: contador
     };
 }
-function aplicarValor(termino, valVariables) {
+/**
+ * Esta función recibirá un término de una expresión y los valores de cada término.
+ * Se aplica la jerarquia de operaciones.
+ * @param termino
+ * @param valVariables Los valores de las variables que se aplicarán al término.
+ * @returns El resultado del término según los valores de sus variables.
+ */
+function aplicarValor(termino, valVariables, negacion) {
     var auxTermino = termino;
-    var valor = valVariables[termino.charCodeAt(0) - 65];
-    if (valor == undefined) {
+    var valor = valVariables[termino.charCodeAt(0) - 65]; // Riesgoso! CAMBIAR
+    if (valor == undefined)
         throw new Error("Debes de especifícar un valor para todos las variables!");
+    if (negacion) {
+        if (valor == 1)
+            valor = 0;
+        else
+            valor = 1;
     }
     return valor;
 }
 function resolverExpresionBooleana(termino, valVariables) {
     var resultado = 0;
-    var VAL = obtenerFragmentos(termino, valVariables, 0);
+    var VAL = obtenerFragmentos(termino, valVariables, 0, false);
     if (typeof VAL == "number") {
         return VAL;
     }
     return 0;
 }
-function obtenerResultado(termino, operacion) {
+function obtenerResultado(termino, operacion, negados) {
+    var valor = 0;
     switch (operacion) {
-        case Operaciones.Suma:
-            return termino.includes(1) ? 1 : 0;
-        case Operaciones.Multiplicacion:
-            return termino.includes(0) ? 0 : 1;
+        case 1:
+            valor = termino.includes(1) ? 1 : 0;
+            break;
+        case 0:
+            valor = termino.includes(0) ? 0 : 1;
+            break;
         default:
             break;
     }
-    return 0;
+    if (negados) {
+        valor = valor == 1 ? 0 : 1;
+    }
+    return valor;
 }
+
+var RESULTADO = resolverExpresionBooleana("A'B'+A", [1, 1]);
+console.log(RESULTADO);
 export default resolverExpresionBooleana;

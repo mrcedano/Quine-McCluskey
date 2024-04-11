@@ -30,4 +30,3 @@ BUTTON.addEventListener("click",() => {
         RESULTADO_SPAN.textContent = "Hubo un error..."
     }
 })
-

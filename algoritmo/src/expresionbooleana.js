@@ -1,4 +1,3 @@
-"use strict";
 var listaSignos = [
     {
         signo: "{",
@@ -192,5 +191,8 @@ function obtenerResultado(termino, operacion, negados) {
     }
     return valor;
 }
-var df = resolverExpresionBooleana("A'B(A+B)+B", [0, 1]);
-console.log(df);
+
+
+const RES = resolverExpresionBooleana("A'B'+B", 2)
+
+console.log(RES);

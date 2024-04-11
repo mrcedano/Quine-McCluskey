@@ -27,14 +27,7 @@ function obtenerTablaVerdad(expresion:string,numeroEntradas:number):number[][] {
     }
     return NUEVATABLA;
 }
-//const TABLAVERDAD:number[][] = obtenerTablaVerdad("A(CD+D+B)+D(A+B)",4)
-//  const TABLAVERDAD:number[][] = obtenerTablaVerdad("A+B(C+A)+B(C+A)",3)
-// const PRIMOS_IMPLICANTES:(string|number)[][] = obtenerPrimosImplicantes(TABLAVERDAD)
-// const AGRUPACION_PRIMOS_IMPLICANTES = agruparPrimosImplicantes(PRIMOS_IMPLICANTES)
-// const COMPARACION_PRIMOS_IMPLICANTES = comparacionPrimosImplicantes(AGRUPACION_PRIMOS_IMPLICANTES)
-// const RESULTADO = resolverTabla(COMPARACION_PRIMOS_IMPLICANTES)
 
-// console.log(RESULTADO);
 
 export default obtenerTablaVerdad
 

@@ -28,3 +28,7 @@ BUTTON.addEventListener("click", function () {
         RESULTADO_SPAN.textContent = "Hubo un error...";
     }
 });
+
+
+    var RESULTADO = quinnmcluskey.resolverTabla(COMPARACION_PRIMOS_IMPLICANTES);
+    console.log(RESULTADO);

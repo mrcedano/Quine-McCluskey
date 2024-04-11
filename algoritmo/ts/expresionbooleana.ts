@@ -243,5 +243,4 @@ function obtenerResultado(termino:(string|number)[], operacion:1|0, negados:bool
     return valor;
 }
 
-const df= resolverExpresionBooleana("A'B(A+B)+B",[1,0])
-console.log(df);
+export default resolverExpresionBooleana
