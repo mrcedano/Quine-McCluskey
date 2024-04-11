@@ -10,9 +10,10 @@ function obtenerTexto(input_element:HTMLInputElement):string {
 
 const EXPRESSION_INPUT:HTMLInputElement|null = document.getElementById("input_expresion") as HTMLInputElement
 const VALORES_INPUT:HTMLInputElement|null = document.getElementById("input_valores") as HTMLInputElement
+const RESULTADO_SPAN:HTMLElement|null = document.getElementById("resultado_span")
 const BUTTON:HTMLElement|null = document.getElementById("enviar")
 
-if(EXPRESSION_INPUT == null || BUTTON == null || VALORES_INPUT == null) throw new Error("Error en el DOM")
+if(EXPRESSION_INPUT == null || BUTTON == null || VALORES_INPUT == null || RESULTADO_SPAN == null)  throw new Error("Error en el DOM")
 
 BUTTON.addEventListener("click",() => {
     const EXPRESION:string = obtenerTexto.call(document,EXPRESSION_INPUT)
@@ -22,6 +23,11 @@ BUTTON.addEventListener("click",() => {
     const PRIMOS_IMPLICANTES:(string|number)[][] = quinnmcluskey.obtenerPrimosImplicantes(TABLAVERDAD)
     const AGRUPACION_PRIMOS_IMPLICANTES = quinnmcluskey.agruparPrimosImplicantes(PRIMOS_IMPLICANTES)
     const COMPARACION_PRIMOS_IMPLICANTES = quinnmcluskey.comparacionPrimosImplicantes(AGRUPACION_PRIMOS_IMPLICANTES)
-    const RESULTADO = quinnmcluskey.resolverTabla(COMPARACION_PRIMOS_IMPLICANTES)
+    try {
+        const RESULTADO = quinnmcluskey.resolverTabla(COMPARACION_PRIMOS_IMPLICANTES)
+        RESULTADO_SPAN.textContent = RESULTADO
+    } catch(exception) {
+        RESULTADO_SPAN.textContent = "Hubo un error..."
+    }
 })
 

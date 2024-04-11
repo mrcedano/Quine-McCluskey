@@ -1,4 +1,4 @@
-import resolverExpresionBooleana from "./expresionbooleana";
+import resolverExpresionBooleana from "./expresionbooleana.js";
 function conversionDecimalaBinario(decimal) {
     return (decimal >>> 0).toString(2);
 }

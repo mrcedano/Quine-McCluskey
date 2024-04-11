@@ -31,6 +31,7 @@ function obtenerPrimosImplicantes(tabla) {
         TABLA[m].pop();
         NUEVATABLA.push(__spreadArray([(m + 1).toString()], TABLA[m], true));
     }
+   //  console.log(NUEVATABLA); IMPRIMIR LOS PRIMOS IMPLICANTES
     return NUEVATABLA;
 }
 function agruparPrimosImplicantes(tabla) {
@@ -46,6 +47,8 @@ function agruparPrimosImplicantes(tabla) {
             PRIMOSIMPLICANTES[UNOS] = [];
         PRIMOSIMPLICANTES[UNOS].push(tabla[m]);
     }
+   // console.log(PRIMOSIMPLICANTES); IMPRIMIR PRIMOSIMPLICANTES
+
     return PRIMOSIMPLICANTES;
 }
 function comparacionPrimosImplicantes(tabla) {
@@ -62,9 +65,18 @@ function comparacionPrimosImplicantes(tabla) {
         PRIMOS_ESENCIALES = __assign(__assign({}, PRIMOS_ESENCIALES), RESULTADO.PRIMOS_ES);
     } while (posibleComparacion);
     if ("PRIMOS_ES" in NUEVATABLA)
-        NUEVATABLA.PRIMOS_ES = undefined;
-    NUEVATABLA = eliminarRepetidos(NUEVATABLA);
-    PRIMOS_ESENCIALES = eliminarRepetidos(PRIMOS_ESENCIALES);
+
+    NUEVATABLA.PRIMOS_ES = undefined;
+    
+    // console.log(NUEVATABLA); Imprime la nueva tabla con primos repetidos.
+    // console.log(PRIMOS_ESENCIALES); Imprime los primos esenciales con primos repetidos. 
+
+    NUEVATABLA = eliminarRepetidos(NUEVATABLA); // Principio DRY
+    PRIMOS_ESENCIALES = eliminarRepetidos(PRIMOS_ESENCIALES); // Principio DRY
+
+    // console.log(NUEVATABLA); Imprime la nueva tabla sin primos repetidos. 
+    // console.log(PRIMOS_ESENCIALES); Imprime los primos esenciales sin primos repetidos.
+
     return __assign(__assign({}, NUEVATABLA), PRIMOS_ESENCIALES);
 }
 function eliminarRepetidos(agrupacion) {
@@ -201,7 +213,9 @@ function resolverTabla(tabla) {
             CONTADORES[ARR[j]]++;
         }
     }
-    var ARREGLO_CONTADORES = Object.entries(CONTADORES)
+   // console.log(CONTADORES); IMPRIMIR LOS CONTADORES DE MINITERMINO 
+   
+   var ARREGLO_CONTADORES = Object.entries(CONTADORES)
         .filter(function (arr) { return arr[1] == 1; }).flat().filter(function (val) { return typeof val == "string"; });
     for (var i = 0; i < ARREGLO.length; i++) {
         var MINITERMINOS = ARREGLO[i];
@@ -220,6 +234,6 @@ function resolverTabla(tabla) {
             }
         }
     }
-    return resultado.substring(0, resultado.length - 1);
+    return resultado.substring(0, resultado.length - 1); // Elimina el último +
 }
 export { obtenerPrimosImplicantes, agruparPrimosImplicantes, comparacionPrimosImplicantes, resolverTabla };

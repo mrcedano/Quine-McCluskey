@@ -34,19 +34,20 @@ body {
 }
 
 .front {
- align-content: center;
- text-align: center;
  background-image: url("recursos/portada.jpeg");
  background-size: cover;
-    height: 300px;
+ height: 300px;
+ display: flex;
 
+ justify-content: center;
+ align-items: center;
+ 
  h1 {
     margin: 0;
     font-size: 3rem;
     color: white;
     font-family: "Honk", Impact;
 }
-
 }
 
 .historia{
@@ -160,5 +161,44 @@ body {
 }
 
 .footer {
-    background-color: orange;
+    background-color: rgb(238, 238, 238);
+    width: 100%;
+    padding: 15px;
+    h3{
+        font-family: "Pixelify";
+        margin: 0px;
+        font-size: 2rem;        
+    }
+}
+
+.resultados {
+    padding: 20px;
+    h3 {
+        font-family: "Pixelify";
+        font-size: 2rem;        
+    }
+    #resultado_span{
+        font-size: 1.5rem;
+        font-family: system-ui,-apple-system;
+        font-weight: bold;
+    }
+}
+
+.lista-integrantes {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+}
+
+li {
+    list-style-type: none;
+    text-align: center;
+    p{
+        font-weight: bold;
+        width: 250px;
+    }
+    img {
+      height: 200px;
+      width: 200px;
+    }
 }
