@@ -208,9 +208,11 @@ function resolverTabla(tabla) {
                 var NUMEROS = LISTA[i].slice(1).filter(function (ev) { return typeof ev == "number"; });
                 for (var m = 0; m < NUMEROS.length; m++) {
                     var NUMERO = NUMEROS[m];
+                    
                     if (NUMERO == -1)
                         continue;
                     resultado += String.fromCharCode(65 + m);
+                    if(NUMERO == 0) resultado+="'"
                 }
                 resultado += "+";
                 break;

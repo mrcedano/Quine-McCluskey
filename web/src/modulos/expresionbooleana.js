@@ -208,7 +208,7 @@ function obtenerResultado(termino, operacion, negados) {
     }
     return valor;
 }
+const RES = resolverExpresionBooleana("(AB)'+B",[1,1]);
+console.log(RES);
 
-var RESULTADO = resolverExpresionBooleana("A'B'+A", [1, 1]);
-console.log(RESULTADO);
 export default resolverExpresionBooleana;

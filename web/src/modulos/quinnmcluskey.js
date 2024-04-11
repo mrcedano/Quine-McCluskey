@@ -213,8 +213,6 @@ function resolverTabla(tabla) {
             CONTADORES[ARR[j]]++;
         }
     }
-   // console.log(CONTADORES); IMPRIMIR LOS CONTADORES DE MINITERMINO 
-   
    var ARREGLO_CONTADORES = Object.entries(CONTADORES)
         .filter(function (arr) { return arr[1] == 1; }).flat().filter(function (val) { return typeof val == "string"; });
     for (var i = 0; i < ARREGLO.length; i++) {
@@ -225,9 +223,11 @@ function resolverTabla(tabla) {
                 var NUMEROS = LISTA[i].slice(1).filter(function (ev) { return typeof ev == "number"; });
                 for (var m = 0; m < NUMEROS.length; m++) {
                     var NUMERO = NUMEROS[m];
+                    console.log(NUMERO);
                     if (NUMERO == -1)
                         continue;
                     resultado += String.fromCharCode(65 + m);
+                    if(NUMERO == 0) resultado+="'"
                 }
                 resultado += "+";
                 break;
